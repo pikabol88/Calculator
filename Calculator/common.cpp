@@ -36,7 +36,7 @@ std::string UnaryOperationsProcessing(std::string str) {
     }
     char unary = BaseOperation::unary_plus;
     std::string newStr = replaceAll(str,"#", "");
-    newStr = replaceAll(newStr, &unary, "");
+    newStr = replaceAll(newStr, "__", "");
     return newStr;
 }
 

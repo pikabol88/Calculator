@@ -4,6 +4,9 @@
 #include "common.h"
 #include "operations.h"
 #include "iexpression.h"
+#include "calculator.h"
+#include <vector>
+#include <map>
 
 
 #include <regex>
@@ -23,7 +26,7 @@ bool brack(std::string s) {
 
 
 bool isNumber(std::string str) {
-    std::regex rx(&BaseOperation::unary_minus);
+    std::regex rx("_");
     int place = str.find_first_of("*/-+^()");
     if (place < 0) {
         return true;
@@ -68,36 +71,8 @@ Expression* Expression:: getExpression() {
 }
 
 double Expression::calculate() {
-    double num;
-    if (unary) {
-        num = left->calculate();
-        return  (negative) ? num * (-1) : num;
-    }
-    else {
-        if (operation == "*") {
-            num = (left->calculate() * right->calculate());
-            return  (negative) ? num * (-1) : num;
-        }
-        else if (operation == "+") {
-            num = (left->calculate() + right->calculate());
-            return (negative) ? num * (-1) : num;
-        }
-        else if (operation == "/") {
-            num = (left->calculate() / right->calculate());
-            return  (negative) ? num * (-1) : num;
-        }
-        else if (operation == "-") {
-            num = (left->calculate() - right->calculate());
-            return (negative) ? num * (-1) : num;
-        }
-        else if (operation == "^") {
-            double num = left->calculate();
-            double degree = right->calculate();
-            num = pow(num, degree);
-            return (negative) ? num * (-1) : num;
-        }
-    }
-
+    double num = operations->execute(left->calculate(), right->calculate());
+    return (negative) ? num * (-1) : num;
 }
 
 
@@ -140,11 +115,19 @@ void Expression::processPower(const std::string str, bool *isActivated) {
 
 void Expression::processFirstPriorityOperations(const std::string str, bool *isActivated) {
     int brackets = 0;
+    std::string tmp;
+    std::vector<Operation*> expressions = (*Calculator::oper_map.find(priority::MUL_DIV)).second;
     for (int i = 0; i < str.length(); ++i) {
-        if (brackets == 0 && (str[i] == '*' || str[i] == '/')) {
-            processExpression(str, i);
-            *isActivated = true;
-            return;
+        tmp = str[i];
+        if (brackets == 0) {
+            for (auto& el :expressions) {
+                if (!(el->getName()).compare(tmp)) {                    
+                    operations = el->getOperation();
+                    processExpression(str, i);
+                    *isActivated = true;
+                    return;
+                }
+            }
         }
         if (str[i] == BaseOperation::left_bracket) brackets++;
         if (str[i] == BaseOperation::right_bracket) brackets--;
@@ -152,13 +135,22 @@ void Expression::processFirstPriorityOperations(const std::string str, bool *isA
 }
 
 
+
 void Expression::processSecondPriorityOperations(const std::string str, bool *isActivated) {
     int brackets = 0;
+    std::string tmp;
+    std::vector<Operation*> expressions = (*Calculator::oper_map.find(priority::ADD_SUB)).second;
     for (int i = 0; i < str.length(); ++i) {
-        if (brackets == 0 && (str[i] == '-' || str[i] == '+')) {
-            processExpression(str, i);
-            *isActivated = true;
-            return;
+        tmp = str[i];
+        if (brackets == 0) {
+            for (auto& el : expressions) {                
+                if (!(el->getName()).compare(tmp)) {
+                    operations = el->getOperation();
+                    processExpression(str, i);
+                    *isActivated = true;
+                    return;
+                }
+            }
         }
         if (str[i] == '(') brackets++;
         if (str[i] == ')') brackets--;
@@ -191,7 +183,7 @@ void Expression::processExpression(std::string str, int index) {
 
 void Expression::addExpression(std::string str, IExpression *&place) {
 
-    std::regex unary_minus(&BaseOperation::unary_minus);
+    std::regex unary_minus("_");
     std::regex right_bracket("\\(");
     std::regex left_bracket("\\)");
 

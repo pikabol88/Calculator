@@ -1,21 +1,23 @@
 #ifndef CALCULATOR_H
 #define CALCULATOR_H
-#include <math.h>
-#include <iostream>
 #include <string> 
-#include<regex>
 #include<map>
 #include<vector>
 #include "operations.h"
+#include "expression.h"
 
 class Calculator {
 public:
+    std::string str_exp;
+    Expression *expression;
+
     Calculator();
-    void setExpression();
+    void setExpression(std::string exp);
     double runCalculating();
-private:
+
     BaseOperation baseOperations;
-    std::map<int, std::vector<Operation*>> operations;
+    static std::map<int, std::vector<Operation*>> oper_map;
+
 };
 
 

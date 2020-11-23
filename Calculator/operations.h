@@ -26,7 +26,7 @@ public:
     priority_t getPriority();
     std::string getName();
     virtual Operation* getOperation() = 0;
-    virtual double execute(IExpression *left, IExpression *right) = 0;
+    virtual double execute(double left, double right) = 0;
 };
 
 
@@ -35,28 +35,28 @@ class Addition: public Operation {
 public:
     Addition();
     virtual Operation *getOperation();
-    virtual double execute(IExpression *left, IExpression *right);
+    virtual double execute(double left, double right);
 };
 
 class Subtraction : public Operation {
 public:
     Subtraction();
     virtual Operation *getOperation();
-    virtual double execute(IExpression *left, IExpression *right);
+    virtual double execute(double left, double right);
 };
 
 class Multiply : public Operation {
 public:
     Multiply();
     virtual Operation *getOperation();
-    virtual double execute(IExpression *left, IExpression *right);
+    virtual double execute(double left, double right);
 };
 
 class Division : public Operation {
 public:
     Division();
     virtual Operation *getOperation();
-    virtual double execute(IExpression *left, IExpression *right);
+    virtual double execute(double left, double right);
 };
 
 

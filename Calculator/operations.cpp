@@ -25,8 +25,8 @@ std::string Operation::getName() {
 
 //суммирование
 Addition::Addition() : Operation(priority::ADD_SUB, "+", false) {}
-double Addition::execute(IExpression * left, IExpression * right) {
-    double num = (left->calculate() + right->calculate());
+double Addition::execute(double left, double right) {
+    double num = (left + right);
     return num;
 }
 
@@ -37,8 +37,8 @@ Operation* Addition::getOperation() {
 
 //минус
 Subtraction::Subtraction() : Operation(priority::ADD_SUB, "-", false) {}
-double Subtraction::execute(IExpression * left, IExpression * right) {
-    double num = (left->calculate() - right->calculate());
+double Subtraction::execute(double left, double right) {
+    double num = (left - right);
     return num;
 }
 Operation* Subtraction::getOperation() {
@@ -47,9 +47,9 @@ Operation* Subtraction::getOperation() {
 
 
 //умножить
-Multiply::Multiply() : Operation(priority::ADD_SUB, "-", false) {}
-double Multiply::execute(IExpression * left, IExpression * right) {
-    double num = (left->calculate() - right->calculate());
+Multiply::Multiply() : Operation(priority::ADD_SUB, "*", false) {}
+double Multiply::execute(double left, double right) {
+    double num = (left*  right);
     return num;
 }
 Operation* Multiply::getOperation() {
@@ -57,9 +57,9 @@ Operation* Multiply::getOperation() {
 }
 
 //деление
-Division::Division() : Operation(priority::ADD_SUB, "-", false) {}
-double Division::execute(IExpression * left, IExpression * right) {
-    double num = (left->calculate() - right->calculate());
+Division::Division() : Operation(priority::ADD_SUB, "/", false) {}
+double Division::execute(double left, double right) {
+    double num = (left / right);
     return num;
 }
 Operation* Division::getOperation() {
