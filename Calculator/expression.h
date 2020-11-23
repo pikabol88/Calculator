@@ -3,20 +3,10 @@
 #include <math.h>
 #include <iostream>
 #include <string> 
-class Expression;
+#include "iexpression.h"
 
-class IExpression {
-public:
-    bool negative;
-    bool unary;
-    //днаюбхрэ гюыхрс нр днаюбкемхъ б мюлаеп
-    virtual Expression *getExpression() { return 0; }
-    virtual double calculate() { return 0; }
-    virtual ~IExpression() {}
-};
 
 class Expression: public IExpression {
-
 private:
     IExpression* left;
     IExpression* right;

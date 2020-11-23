@@ -26,7 +26,7 @@ public:
     priority_t getPriority();
     std::string getName();
     virtual Operation* getOperation() = 0;
-    virtual double(IExpression *left, IExpression *right) = 0;
+    virtual double execute(IExpression *left, IExpression *right) = 0;
 };
 
 
@@ -72,6 +72,8 @@ public:
     static char double_unary_minus[];
     static char unary_plus;
     static char operations[];
+    static char right_bracket;
+    static char left_bracket;
 
 };
 

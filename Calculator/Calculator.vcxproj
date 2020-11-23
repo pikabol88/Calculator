@@ -123,6 +123,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="calculator.cpp" />
     <ClCompile Include="common.cpp" />
     <ClCompile Include="expression.cpp" />
     <ClCompile Include="main.cpp" />
@@ -130,6 +131,7 @@
     <ClCompile Include="trigonometry.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="calculator.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="expression.h" />
     <ClInclude Include="iexpression.h" />

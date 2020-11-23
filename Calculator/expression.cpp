@@ -3,6 +3,7 @@
 #include "trigonometry.h"
 #include "common.h"
 #include "operations.h"
+#include "iexpression.h"
 
 
 #include <regex>
@@ -131,8 +132,8 @@ void Expression::processPower(const std::string str, bool *isActivated) {
             *isActivated = true;
             return;
         }
-        if (str[i] == '(') brackets++;
-        if (str[i] == ')') brackets--;
+        if (str[i] == BaseOperation::left_bracket) brackets++;
+        if (str[i] == BaseOperation::right_bracket) brackets--;
     }
 }
 
@@ -145,8 +146,8 @@ void Expression::processFirstPriorityOperations(const std::string str, bool *isA
             *isActivated = true;
             return;
         }
-        if (str[i] == '(') brackets++;
-        if (str[i] == ')') brackets--;
+        if (str[i] == BaseOperation::left_bracket) brackets++;
+        if (str[i] == BaseOperation::right_bracket) brackets--;
     }
 }
 
@@ -166,10 +167,11 @@ void Expression::processSecondPriorityOperations(const std::string str, bool *is
 
 
 void Expression::processBrackets(const std::string str, bool *isActivated) {
-    if (str[0] == '(' && str[str.length() - 1] == ')' && brack(substr(str, 1, str.length() - 2))) {
+    if (str[0] == BaseOperation::left_bracket && str[str.length() - 1] == BaseOperation::right_bracket && brack(substr(str, 1, str.length() - 2))) {
         *isActivated = true;
         return parseExpression(substr(str, 1, str.length() - 2));
-    } else if (str[0] == BaseOperation::unary_minus && str[1] == '(' && str[str.length() - 1] == ')' && brack(substr(str, 2, str.length() - 3))) {
+    } else if (str[0] == BaseOperation::unary_minus && str[1] == BaseOperation::left_bracket && 
+               str[str.length() - 1] == BaseOperation::right_bracket && brack(substr(str, 2, str.length() - 3))) {
         negative = true;
         *isActivated = true;
         return parseExpression(substr(str, 2, str.length() - 3));
@@ -201,7 +203,7 @@ void Expression::addExpression(std::string str, IExpression *&place) {
         first_minus = true;
     }
     std::string tmp = str;
-    if (str[0] == '(') {       
+    if (str[0] == BaseOperation::left_bracket) {       
         tmp = substr(tmp, 1, tmp.length() - 2);
         if (str[1] == BaseOperation::unary_minus) {
             tmp = std::regex_replace(tmp, unary_minus, "");

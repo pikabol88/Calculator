@@ -1,9 +1,12 @@
 #include "operations.h"
+#include "expression.h"
 
 char BaseOperation::unary_minus = '_';
 char BaseOperation::double_unary_minus[] = { '_','_' };
 char BaseOperation::unary_plus = '#';
 char BaseOperation::operations[] = { '+','*','/','-','(' };
+char BaseOperation::left_bracket = '(';
+char BaseOperation::right_bracket = ')';
 
 Operation::Operation(priority_t operationPriority, std::string operationName, bool function) {
     priority = operationPriority;
