@@ -8,18 +8,15 @@ int main() {
 
     std::string str;
     Calculator calculator;
-    while (std::cin >> str) {
-        str = UnaryOperationsProcessing(str);
-        calculator.setExpression(str);
-        if (ErrorState::getErrorState() == ErrorState::SUCCESS) {
-            double result = calculator.runCalculating();
+    double result;
+    while (std::getline(std::cin, str)) {
+        result = calculator.runCalculating(str);
+        if (ErrorState::isSuccess()) {
             std::cout << result << "\n\n";
         }
-        /*
-        Expression expression = *new Expression(str);
-        double result = expression.calculate();*/
-       
-        
+        else {
+            std::cout << ErrorState::getErrorMessage()<<"\n";
+        }
     }
 
     return 0;

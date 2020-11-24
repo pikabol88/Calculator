@@ -8,86 +8,113 @@ void Calculator::setExpression(std::string exp) {
     str_exp = exp;
     ErrorState::setErrorState(ErrorState::SUCCESS);
     processError();
-    if (ErrorState::getErrorState() == ErrorState::SUCCESS) {
+    if (ErrorState::isSuccess()) {
         if (expression) {
             free(expression);
         }
         expression = new Expression(exp);
     }
-    else {
-        std::cout << ErrorState::getErrorMessage();
-    }
  }
+
+std::string Calculator::UnaryOperationsProcessing(std::string str) {    
+    bool isOperation = false;
+    int i = 0;
+    str = replaceAll(str, " ", "");
+    int size = str.length();
+    while (str[i] == '-') { str[i++] = BaseOperation::unary_minus; }
+    while (str[i] == '+') { str[i++] = BaseOperation::unary_plus; }
+
+    for (i; i < size; i++) {
+        if (strchr(BaseOperation::operations, str[i])) {
+            do {
+                i++;
+                if (str[i] == '-') { str[i] = BaseOperation::unary_minus; }
+                else if (str[i] == '+') { str[i] = BaseOperation::unary_plus; }
+                break;
+            } while (i < size - 1);
+            i--;
+        }
+    }
+    char unary = BaseOperation::unary_plus;
+    
+    std::string newStr = replaceAll(str, "#", "");
+    newStr = replaceAll(newStr, "__", "");
+    
+    return newStr;
+}
 
 void Calculator::processError() {
     int left_bracket = 0;
     int right_bracket = 0;
     bool isDigit = false;
+    bool isPoint = false;
     std::string lexem;
     int startIndex;
     for (int i = 0;i < str_exp.size();i++) {
         while (isdigit(str_exp[i])) {
             isDigit = true;
-            i++;           
+            i++;
         }
         if (i >= str_exp.size())
             break;
-        if (str_exp[i] == '(') {
-            left_bracket++;
-            isDigit = false;
-        }
-        else if (str_exp[i] == ')') {
-            right_bracket++;
-            if (!isDigit) {
-                ErrorState::setErrorState(ErrorState::ERROR_EMPTY_BRACKETS);
+
+        if (str_exp[i] == '.') {
+            if (isPoint) {
+                ErrorState::setErrorState(ErrorState::ERROR_POINT);
                 break;
             }
+            isPoint = true;
         }
-        else if (isalpha(str_exp[i])) {
-            startIndex = i;
-            while (isalpha(str_exp[i])) i++;            
-            if (!isLexemDefined(substr(str_exp, startIndex, i-startIndex))) {
-                ErrorState::setErrorState(ErrorState::ERROR_FUNCTION);
-                break;
-            }
-            i--;
-            
-        }
-        else if (str_exp[i] == '.');
         else {
-            std::string tmp(1, str_exp[i]);
-            if (!isLexemDefined(tmp)) {
-                ErrorState::setErrorState(ErrorState::ERROR_OPERATION);
-                break;
+            isPoint = false;
+            
+            if (str_exp[i] == '(') {
+                left_bracket++;
+                isDigit = false;
+            }
+            else if (str_exp[i] == ')') {
+                right_bracket++;
+                if (!isDigit) {
+                    ErrorState::setErrorState(ErrorState::ERROR_EMPTY_BRACKETS);
+                    break;
+                }
+            }
+            else if (isalpha(str_exp[i])) {
+                startIndex = i;
+                while (isalpha(str_exp[i])) i++;
+                if (!isLexemDefined(substr(str_exp, startIndex, i - startIndex))) {
+                    ErrorState::setErrorState(ErrorState::ERROR_FUNCTION);
+                    break;
+                }
+                i--;
+
+            }
+            else {
+                startIndex = i;
+                while (!isalpha(str_exp[i]) && !isdigit(str_exp[i])
+                    && str_exp[i] != BaseOperation::left_bracket&&str_exp[i] != BaseOperation::right_bracket) i++;
+
+                if (!isLexemDefined(substr(str_exp, startIndex, i - startIndex))) {
+                    ErrorState::setErrorState(ErrorState::ERROR_OPERATION);
+                    break;
+                }
             }
         }
     }
-    if (ErrorState::getErrorState() == ErrorState::SUCCESS) {
+    if (ErrorState::isSuccess()) {
         if (left_bracket != right_bracket) {
             ErrorState::setErrorState(ErrorState::ERROR_BRACKETS);
         }
     }
-
-    /*std::cout << (std::find(vector1.begin(), vector1.end(), 13) == vector1.end() ? "нету " : "есть ") << 13 << " в массиве." << std::endl;
-
-    std::vector<Operation*> expressions = (*Calculator::oper_map.find(priority::MUL_DIV)).second;
-    for (int i = 0; i < str.length(); ++i) {
-        tmp = str[i];
-        if (brackets == 0) {
-            for (auto& el : expressions) {
-                if (!(el->getName()).compare(tmp)) {
-                    operations = el->getOperation();
-                    processExpression(str, i);
-                    *isActivated = true;
-                    return;
-                }
-            }
-        }*/
 }
 
-double Calculator::runCalculating() {   
-    return  expression->calculate();
-   
+double Calculator::runCalculating(std::string str) {  
+    str = UnaryOperationsProcessing(str);
+    setExpression(str);
+    if (ErrorState::isSuccess()) {
+        return  expression->calculate();
+    }
+   // return  expression->calculate();   
 }
 
 bool Calculator::isLexemDefined(std::string lexem) {

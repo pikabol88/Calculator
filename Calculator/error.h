@@ -7,6 +7,7 @@ public:
     
     typedef enum errorState {
         SUCCESS,
+        ERROR_POINT,
         ERROR_BRACKETS,
         ERROR_OPERATION,
         ERROR_FUNCTION,
@@ -17,6 +18,7 @@ public:
     static error_state_t getErrorState();
     static void setErrorState(error_state_t error);
     static std::string getErrorMessage();
+    static bool isSuccess();
 private:
     static error_state_t calc_error;
 

@@ -29,8 +29,16 @@ std::string ErrorState::getErrorMessage() {
     case ERROR_EMPTY_BRACKETS:
         message = "ERROR: check the input ->  problem is the empty brackets\n";
         break;
+    case ERROR_POINT:
+        message = "ERROR: check the input ->  problem is the points in the float number\n";
+        break;
     default:
         break;
     }
     return message;
-};
+}
+bool ErrorState::isSuccess() {
+    if (getErrorState() == SUCCESS) return true;
+    return false;
+}
+;

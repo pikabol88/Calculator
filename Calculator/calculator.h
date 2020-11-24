@@ -16,8 +16,9 @@ public:
 
     Calculator();
     void setExpression(std::string exp);
+    std::string UnaryOperationsProcessing(std::string str);
     void processError();
-    double runCalculating();
+    double runCalculating(std::string str);
 
     BaseOperation baseOperations;
     static std::map<int, std::vector<Operation*>> oper_map;

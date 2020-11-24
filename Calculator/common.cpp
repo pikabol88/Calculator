@@ -15,28 +15,5 @@ std::string replaceAll(const std::string& inputStr, const char *oldExp, const ch
     return newStr;
 }
 
-std::string UnaryOperationsProcessing(std::string str) {
-    int size = str.length();
-    bool isOperation = false;
-    int i = 0;
 
-    while (str[i] == '-') { str[i++] = BaseOperation::unary_minus; }
-    while (str[i] == '+') { str[i++] = BaseOperation::unary_plus; }
-
-    for (i; i < size; i++) {
-        if (strchr(BaseOperation::operations, str[i])) {
-            do {
-                i++;
-                if (str[i] == '-') { str[i] = BaseOperation::unary_minus; }
-                else if (str[i] == '+') { str[i] = BaseOperation::unary_plus; }
-                break;
-            } while (i < size - 1);
-            i--;
-        }
-    }
-    char unary = BaseOperation::unary_plus;
-    std::string newStr = replaceAll(str,"#", "");
-    newStr = replaceAll(newStr, "__", "");
-    return newStr;
-}
 
