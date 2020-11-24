@@ -11,12 +11,15 @@ int main() {
     while (std::cin >> str) {
         str = UnaryOperationsProcessing(str);
         calculator.setExpression(str);
-        calculator.runCalculating();
+        if (ErrorState::getErrorState() == ErrorState::SUCCESS) {
+            double result = calculator.runCalculating();
+            std::cout << result << "\n\n";
+        }
         /*
         Expression expression = *new Expression(str);
         double result = expression.calculate();*/
-        double result = calculator.runCalculating();
-        std::cout << result<<"\n\n";
+       
+        
     }
 
     return 0;

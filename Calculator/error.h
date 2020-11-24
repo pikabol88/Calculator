@@ -10,16 +10,17 @@ public:
         ERROR_BRACKETS,
         ERROR_OPERATION,
         ERROR_FUNCTION,
+        ERROR_EMPTY_BRACKETS,
     } error_state_t;
    
     ErrorState();
-
+    static error_state_t getErrorState();
+    static void setErrorState(error_state_t error);
+    static std::string getErrorMessage();
 private:
     static error_state_t calc_error;
 
 
-    static error_state_t getErrorState();
-    static void setErrorState(error_state_t error);
-    static std::string getErrorMessage();
+    
 };
 #endif //ERROR_H
