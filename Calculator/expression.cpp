@@ -1,6 +1,5 @@
-
 #include "expression.h"
-#include "trigonometry.h"
+#include "function.h"
 #include "common.h"
 #include "operations.h"
 #include "iexpression.h"
@@ -34,13 +33,21 @@ bool isNumber(std::string str) {
     return false;
 }
 
-std::string defineTrigonometry(std::string str) {
-    //Заменить на элементы класса    
-    if (str.find_first_of(TrigonometryOperation::sinus) < 2) return TrigonometryOperation::sinus;
-    else if (str.find_first_of(TrigonometryOperation::cosine) < 2) return TrigonometryOperation::cosine;
-    else if (str.find_first_of(TrigonometryOperation::tangent) < 2) return TrigonometryOperation::tangent;
-    else if (str.find_first_of(TrigonometryOperation::cotangent) < 2) return TrigonometryOperation::cotangent;
-    else return std::string();
+Operation* defineTrigonometry(std::string str) {
+    std::string tmp;
+    std::vector<Operation*> expressions = (*Calculator::oper_map.find(priority::FUNCTION)).second;
+    for (int i = 0;i < str.size();i++) {
+        if (str[i] == BaseOperation::left_bracket) {
+            tmp = substr(str, 0, i);
+            break;
+        }
+    }
+    for (auto& el : expressions) {        
+        if (!(el->getName()).compare(tmp)) {
+           return el->getOperation();
+        }
+    }
+    return nullptr;
 }
 
 Number::Number(std::string num) {
@@ -71,7 +78,18 @@ Expression* Expression:: getExpression() {
 }
 
 double Expression::calculate() {
-    double num = operations->execute(left->calculate(), right->calculate());
+    double num;
+    if (!operations) {
+        num = left->calculate();
+    }
+    else {
+        if (right) {
+            num = operations->execute(left->calculate(), right->calculate());
+        }
+        else {
+            num = operations->execute(left->calculate(), 0);
+        }
+    }
     return (negative) ? num * (-1) : num;
 }
 
@@ -97,15 +115,24 @@ void Expression::parseExpression(const std::string str) {
 
 void Expression::processPower(const std::string str, bool *isActivated) {
     int brackets = 0;
+    std::string tmp;
+    std::vector<Operation*> expressions = (*Calculator::oper_map.find(priority::POWER)).second;
     for (int i = 0; i < str.length(); ++i) {
-        if (brackets == 0 && (str[i] == '^')) {
-            if (str[0] == BaseOperation::unary_minus) {
-                negative = true;
-                processExpression(substr(str, 1, str.length() - 1), i-1);
-            } else 
-                processExpression(str, i);
-            *isActivated = true;
-            return;
+        tmp = str[i];
+        if (brackets == 0) {
+            for (auto& el : expressions) {
+                if (!(el->getName()).compare(tmp)) {
+                    operations = el->getOperation();
+                    if (str[0] == BaseOperation::unary_minus) {
+                        negative = true;
+                        processExpression(substr(str, 1, str.length() - 1), i - 1);
+                    }
+                    else
+                        processExpression(str, i);
+                    *isActivated = true;
+                    return;
+                }
+            }
         }
         if (str[i] == BaseOperation::left_bracket) brackets++;
         if (str[i] == BaseOperation::right_bracket) brackets--;
@@ -186,7 +213,7 @@ void Expression::addExpression(std::string str, IExpression *&place) {
     std::regex unary_minus("_");
     std::regex right_bracket("\\(");
     std::regex left_bracket("\\)");
-
+    Operation *opertmp;
     bool first_minus = false;
     bool minus_after_bracket = false;
     std::string func;
@@ -202,11 +229,12 @@ void Expression::addExpression(std::string str, IExpression *&place) {
             minus_after_bracket = true;
         }
     }
-    func = defineTrigonometry(str);
-    if (!func.empty()) {
-        place = new Function(tmp, func);
+    opertmp = defineTrigonometry(str);
+    if (opertmp) {
+        //operations = opertmp;
+        place = new Function(tmp, opertmp);
         place->negative = first_minus;
-    }
+    }    
     else {
         if (isNumber(tmp)) {
             tmp = std::regex_replace(tmp, unary_minus, "");

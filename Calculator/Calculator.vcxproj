@@ -125,18 +125,20 @@
   <ItemGroup>
     <ClCompile Include="calculator.cpp" />
     <ClCompile Include="common.cpp" />
+    <ClCompile Include="error.cpp" />
     <ClCompile Include="expression.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="operations.cpp" />
-    <ClCompile Include="trigonometry.cpp" />
+    <ClCompile Include="function.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="calculator.h" />
     <ClInclude Include="common.h" />
+    <ClInclude Include="error.h" />
     <ClInclude Include="expression.h" />
     <ClInclude Include="iexpression.h" />
     <ClInclude Include="operations.h" />
-    <ClInclude Include="trigonometry.h" />
+    <ClInclude Include="function.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

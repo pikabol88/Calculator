@@ -26,8 +26,18 @@ Calculator::Calculator() {
     mul_div.push_back(new Multiply());
     mul_div.push_back(new Division());
 
+    std::vector<Operation*> pov;
+    pov.push_back(new Power());
+
+    std::vector<Operation*> fun;
+    fun.push_back(new Cosine());
+    fun.push_back(new Sinus());
+
+
     oper_map.insert(make_pair(priority::ADD_SUB, add_sub));
     oper_map.insert(make_pair(priority::MUL_DIV, mul_div));
+    oper_map.insert(make_pair(priority::POWER, pov));
+    oper_map.insert(make_pair(priority::FUNCTION, fun));
 
     
 }

@@ -59,6 +59,29 @@ public:
     virtual double execute(double left, double right);
 };
 
+class Power : public Operation {
+public:
+    Power();
+    virtual Operation *getOperation();
+    virtual double execute(double left, double right);
+};
+
+
+class Cosine : public Operation {
+public:
+    Cosine();
+    virtual Operation *getOperation();
+    virtual double execute(double left, double right);
+};
+
+
+class Sinus : public Operation {
+public:
+    Sinus();
+    virtual Operation *getOperation();
+    virtual double execute(double left, double right);
+};
+
 
 
 

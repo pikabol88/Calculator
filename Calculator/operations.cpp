@@ -66,3 +66,33 @@ Operation* Division::getOperation() {
     return new Division();
 }
 
+//степень
+Power::Power() : Operation(priority::POWER, "^", false) {}
+double Power::execute(double left, double right) {
+    double num = pow(left, right);
+    return num;
+}
+Operation* Power::getOperation() {
+    return new Power();
+}
+
+//косинус
+Cosine::Cosine() : Operation(priority::FUNCTION, "cos", false) {}
+double Cosine::execute(double left, double right) {
+    double num = cos(left);
+    return num;
+}
+Operation* Cosine::getOperation() {
+    return new Cosine();
+}
+
+//синус
+Sinus::Sinus() : Operation(priority::FUNCTION, "sin", false) {}
+double Sinus::execute(double left, double right) {
+    double num = sin(left);
+    return num;
+}
+Operation* Sinus::getOperation() {
+    return new Sinus();
+}
+

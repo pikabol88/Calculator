@@ -4,22 +4,12 @@
 #include <iostream>
 #include <string> 
 #include "expression.h"
-
-class TrigonometryOperation {
-public:
-    static std::string sinus;
-    static std::string cosine;
-    static std::string tangent;
-    static std::string cotangent;
-};
-
+#include "operations.h"
 
 class Function : public Expression {   
 public:
     IExpression* expression;
-
-    Function(std::string str, std::string func);
-
+    Function(std::string str, Operation *oper);
     double calculate();
 };
 
