@@ -79,11 +79,11 @@ Expression* Expression:: getExpression() {
 
 double Expression::calculate() {
     double num;
-    if (!operations) {
+    if (operations == nullptr) {
         num = left->calculate();
     }
     else {
-        if (right) {
+        if (!(right == nullptr)) {
             num = operations->execute(left->calculate(), right->calculate());
         }
         else {
@@ -231,7 +231,6 @@ void Expression::addExpression(std::string str, IExpression *&place) {
     }
     opertmp = defineTrigonometry(str);
     if (opertmp) {
-        //operations = opertmp;
         place = new Function(tmp, opertmp);
         place->negative = first_minus;
     }    

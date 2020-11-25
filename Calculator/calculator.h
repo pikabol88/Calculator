@@ -1,13 +1,10 @@
 #ifndef CALCULATOR_H
 #define CALCULATOR_H
-#include <string> 
-#include<map>
-#include<vector>
+
 #include "operations.h"
 #include "expression.h"
 #include "error.h"
 #include "common.h"
-#include <string>
 
 class Calculator {
 public:
@@ -17,6 +14,7 @@ public:
     Calculator();
     void setExpression(std::string exp);
     std::string UnaryOperationsProcessing(std::string str);
+    bool processOperationError(int * index);
     void processError();
     double runCalculating(std::string str);
 
@@ -28,11 +26,12 @@ private:
     std::vector<std::string> valid_functions;
 
     bool isLexemDefined(std::string lexem);
-    bool isLexemDefined(char * symbol);
     bool isOperationDefined(std::string lexem);
     bool isFunctionDefined(std::string lexem);
 
 
+
+    bool processAlphaError(int *index);
 };
 
 
