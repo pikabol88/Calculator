@@ -12,16 +12,18 @@ public:
     Expression *expression;
 
     Calculator();
-    void setExpression(std::string exp);
-    std::string UnaryOperationsProcessing(std::string str);
-    bool processOperationError(int * index);
-    void processError();
-    double runCalculating(std::string str);
+    ~Calculator();
 
-    BaseOperation baseOperations;
+    double runCalculating(std::string str);
+    void setExpression(std::string exp);
+    void processError();
+    std::string UnaryOperationsProcessing(std::string str); 
+   
+    //BaseOperation baseOperations;
     static std::map<int, std::vector<Operation*>> oper_map;
 
 private:
+
     std::vector<std::string> valid_operations;
     std::vector<std::string> valid_functions;
 
@@ -29,12 +31,8 @@ private:
     bool isOperationDefined(std::string lexem);
     bool isFunctionDefined(std::string lexem);
 
-
-
     bool processAlphaError(int *index);
+    bool processOperationError(int * index);
 };
-
-
-
 
 #endif //CALCULATOR_H

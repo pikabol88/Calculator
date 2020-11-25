@@ -2,7 +2,6 @@
 
 std::map<int, std::vector<Operation*>> Calculator::oper_map = {};
 
-
 void Calculator::setExpression(std::string exp) {
     str_exp = exp;
     ErrorState::setErrorState(ErrorState::SUCCESS);
@@ -35,7 +34,6 @@ std::string Calculator::UnaryOperationsProcessing(std::string str) {
     }
     std::string newStr = replaceAll(str, "#", "");
     newStr = replaceAll(newStr, "__", "");
-
     return newStr;
 }
 
@@ -43,7 +41,7 @@ bool Calculator::processAlphaError(int *index){
     int startIndex = *(index);
     int currentIndex = *(index);
     while (isalpha(str_exp[currentIndex])) currentIndex++;
-    if (!isLexemDefined(substr(str_exp, startIndex, currentIndex - startIndex))) {
+    if (!isLexemDefined(substring(str_exp, startIndex, currentIndex - startIndex))) {
         ErrorState::setErrorState(ErrorState::ERROR_FUNCTION);
         return true;
     }
@@ -59,12 +57,32 @@ bool Calculator::processOperationError(int *index) {
         && str_exp[currentIndex] != BaseOperation::left_bracket&&str_exp[currentIndex] != BaseOperation::right_bracket) 
         currentIndex++;
 
-    if (!isLexemDefined(substr(str_exp, startIndex, currentIndex - startIndex))) {
+    if (!isLexemDefined(substring(str_exp, startIndex, currentIndex - startIndex))) {
         ErrorState::setErrorState(ErrorState::ERROR_OPERATION);
         return true;
     }
     currentIndex--;
     *(index) = currentIndex;
+    return false;
+}
+
+bool Calculator::isLexemDefined(std::string lexem) {
+    if (isalpha(lexem[0])) return isFunctionDefined(lexem);
+    else return isOperationDefined(lexem);
+}
+
+
+bool Calculator::isOperationDefined(std::string lexem) {
+    for (auto& el : valid_operations) {
+        if (!el.compare(lexem)) { return true; }
+    }
+    return false;
+}
+
+bool Calculator::isFunctionDefined(std::string lexem) {
+    for (auto& el : valid_functions) {
+        if (!el.compare(lexem)) { return true; }
+    }
     return false;
 }
 
@@ -112,6 +130,8 @@ void Calculator::processError() {
     }
 }
 
+
+
 double Calculator::runCalculating(std::string str) {
     str = UnaryOperationsProcessing(str);
     setExpression(str);
@@ -120,25 +140,6 @@ double Calculator::runCalculating(std::string str) {
     }
 }
 
-bool Calculator::isLexemDefined(std::string lexem) {
-    if (isalpha(lexem[0])) return isFunctionDefined(lexem);
-    else return isOperationDefined(lexem);
-}
-
-
-bool Calculator::isOperationDefined(std::string lexem) {
-    for (auto& el : valid_operations) {
-        if (!el.compare(lexem)) {  return true; }
-    }
-    return false;
-}
-
-bool Calculator::isFunctionDefined(std::string lexem) {
-    for (auto& el : valid_functions) {
-        if (!el.compare(lexem)) {  return true; }
-    }
-    return false;
-}
 
 Calculator::Calculator() {
     Operation *element;
@@ -184,3 +185,13 @@ Calculator::Calculator() {
     oper_map.insert(make_pair(priority::POWER, pov));
     oper_map.insert(make_pair(priority::FUNCTION, fun));
 }
+
+Calculator::~Calculator() {
+    delete expression;
+    for (auto& map_el : oper_map) {
+        for (auto& vec_el : map_el.second) {
+            delete vec_el;
+        }
+    }
+}
+

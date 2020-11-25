@@ -4,6 +4,8 @@
 #include <iostream>
 #include <string> 
 #include "iexpression.h"
+#include "operations.h"
+#include "common.h"
 
 
 class Expression: public IExpression {
@@ -13,7 +15,6 @@ private:
 
 protected:
     std::string operation;
-    std::string full;    
 
 public:
     Expression();
@@ -24,7 +25,6 @@ public:
     double calculate();
     ~Expression();
     
-
 protected:
     void processExpression(std::string str, int index);
     void addExpression(std::string str, IExpression *&place);
@@ -35,13 +35,7 @@ private:
     void processSecondPriorityOperations(const std::string str, bool * isActivated);
     void processFirstPriorityOperations(const std::string str, bool * isActivated);
     void processBrackets(const std::string str, bool * isActivated);
-};
-
-class Number : public  IExpression {
-    std::string number;
-public:
-    Number(std::string num);
-    virtual double calculate();
+    Operation* defineTrigonometry(std::string str);
 };
 
 

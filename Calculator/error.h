@@ -14,15 +14,11 @@ public:
         ERROR_EMPTY_BRACKETS,
     } error_state_t;
    
-    ErrorState();
     static error_state_t getErrorState();
     static void setErrorState(error_state_t error);
     static std::string getErrorMessage();
     static bool isSuccess();
 private:
     static error_state_t calc_error;
-
-
-    
 };
 #endif //ERROR_H

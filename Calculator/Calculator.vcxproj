@@ -128,6 +128,7 @@
     <ClCompile Include="error.cpp" />
     <ClCompile Include="expression.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="number.cpp" />
     <ClCompile Include="operations.cpp" />
     <ClCompile Include="function.cpp" />
   </ItemGroup>
@@ -137,6 +138,7 @@
     <ClInclude Include="error.h" />
     <ClInclude Include="expression.h" />
     <ClInclude Include="iexpression.h" />
+    <ClInclude Include="number.h" />
     <ClInclude Include="operations.h" />
     <ClInclude Include="function.h" />
   </ItemGroup>

@@ -5,7 +5,7 @@ Function::Function(std::string str, Operation *oper) {
     operations = oper;
     int i = 0;
     while (isalpha(str[i])) i++;
-    addExpression(substr(str, i, str.length() - i), this->expression);
+    addExpression(substring(str, i, str.length() - i), this->expression);
 }
 
 double Function::calculate() {   

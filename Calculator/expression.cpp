@@ -1,44 +1,24 @@
 #include "expression.h"
 #include "function.h"
-#include "common.h"
-#include "operations.h"
-#include "iexpression.h"
 #include "calculator.h"
-#include <vector>
-#include <map>
+#include "number.h"
 
-
-#include <regex>
-
-
-
-bool brack(std::string s) {
-    int brackets = 0;
-    for (int i = 0; i < s.length(); ++i) {
-        if (s[i] == '(') brackets++;
-        if (s[i] == ')') brackets--;
-        if (brackets < 0) return 0;
-    }
-    if (brackets != 0) return 0;
-    return 1;
+Expression::Expression() {
+    negative = false;
+    unary = false;
 }
 
-
-bool isNumber(std::string str) {
-    std::regex rx("_");
-    int place = str.find_first_of("*/-+^()");
-    if (place < 0) {
-        return true;
-    }
-    return false;
+Expression::~Expression() {
+    delete left;
+    delete right;
 }
 
-Operation* defineTrigonometry(std::string str) {
+Operation* Expression::defineTrigonometry(std::string str) {
     std::string tmp;
     std::vector<Operation*> expressions = (*Calculator::oper_map.find(priority::FUNCTION)).second;
     for (int i = 0;i < str.size();i++) {
         if (str[i] == BaseOperation::left_bracket) {
-            tmp = substr(str, 0, i);
+            tmp = substring(str, 0, i);
             break;
         }
     }
@@ -50,27 +30,9 @@ Operation* defineTrigonometry(std::string str) {
     return nullptr;
 }
 
-Number::Number(std::string num) {
-    number = num;
-    negative = false;
-   
-}
-
-double Number:: calculate() {
-    double num = std::stod(number);    
-    return (negative) ? num * (-1) : num;
-}
-
-
-Expression::Expression() {
-    negative = false;
-    unary = false;
-}
-
 Expression::Expression(std::string str){
     negative = false;
     parseExpression(str);
-    
 }
 
 Expression* Expression:: getExpression() {
@@ -83,23 +45,16 @@ double Expression::calculate() {
         num = left->calculate();
     }
     else {
-        if (!(right == nullptr)) {
+        if (!(right == nullptr)) { 
             num = operations->execute(left->calculate(), right->calculate());
-        }
-        else {
-            num = operations->execute(left->calculate(), 0);
-        }
+        } else num = operations->execute(left->calculate(), 0);
     }
     return (negative) ? num * (-1) : num;
 }
 
 
-Expression::~Expression() {
-}
-
 void Expression::parseExpression(const std::string str) {    
     bool isRecurtionActivated = false;
-    full = str;
 
     processBrackets(str, &isRecurtionActivated);
     if (isRecurtionActivated) return;  
@@ -125,7 +80,7 @@ void Expression::processPower(const std::string str, bool *isActivated) {
                     operations = el->getOperation();
                     if (str[0] == BaseOperation::unary_minus) {
                         negative = true;
-                        processExpression(substr(str, 1, str.length() - 1), i - 1);
+                        processExpression(substring(str, 1, str.length() - 1), i - 1);
                     }
                     else
                         processExpression(str, i);
@@ -186,21 +141,21 @@ void Expression::processSecondPriorityOperations(const std::string str, bool *is
 
 
 void Expression::processBrackets(const std::string str, bool *isActivated) {
-    if (str[0] == BaseOperation::left_bracket && str[str.length() - 1] == BaseOperation::right_bracket && brack(substr(str, 1, str.length() - 2))) {
+    if (str[0] == BaseOperation::left_bracket && str[str.length() - 1] == BaseOperation::right_bracket && brack(substring(str, 1, str.length() - 2))) {
         *isActivated = true;
-        return parseExpression(substr(str, 1, str.length() - 2));
+        return parseExpression(substring(str, 1, str.length() - 2));
     } else if (str[0] == BaseOperation::unary_minus && str[1] == BaseOperation::left_bracket && 
-               str[str.length() - 1] == BaseOperation::right_bracket && brack(substr(str, 2, str.length() - 3))) {
+               str[str.length() - 1] == BaseOperation::right_bracket && brack(substring(str, 2, str.length() - 3))) {
         negative = true;
         *isActivated = true;
-        return parseExpression(substr(str, 2, str.length() - 3));
+        return parseExpression(substring(str, 2, str.length() - 3));
     }    
 }
 
 
 void Expression::processExpression(std::string str, int index) {
-    std::string substrl = substr(str, 0, index);
-    std::string substrr = substr(str, index + 1, str.length() - index - 1);
+    std::string substrl = substring(str, 0, index);
+    std::string substrr = substring(str, index + 1, str.length() - index - 1);
     if(!substrl.empty()) addExpression(substrl, this->left);
     if(!substrr.empty()) addExpression(substrr, this->right);
     else unary = true;
@@ -218,12 +173,12 @@ void Expression::addExpression(std::string str, IExpression *&place) {
     bool minus_after_bracket = false;
     std::string func;
     if (str[0] == BaseOperation::unary_minus) {
-        str = substr(str, 1, str.length()-1);
+        str = substring(str, 1, str.length()-1);
         first_minus = true;
     }
     std::string tmp = str;
     if (str[0] == BaseOperation::left_bracket) {       
-        tmp = substr(tmp, 1, tmp.length() - 2);
+        tmp = substring(tmp, 1, tmp.length() - 2);
         if (str[1] == BaseOperation::unary_minus) {
             tmp = std::regex_replace(tmp, unary_minus, "");
             minus_after_bracket = true;

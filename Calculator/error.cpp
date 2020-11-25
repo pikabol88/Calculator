@@ -1,8 +1,6 @@
 #include "error.h"
 
 
-ErrorState::ErrorState() {}
-
 ErrorState::error_state_t ErrorState::calc_error = ErrorState::errorState::SUCCESS;
 
 ErrorState::error_state_t ErrorState::getErrorState() {
@@ -37,8 +35,8 @@ std::string ErrorState::getErrorMessage() {
     }
     return message;
 }
+
 bool ErrorState::isSuccess() {
     if (getErrorState() == SUCCESS) return true;
     return false;
 }
-;
