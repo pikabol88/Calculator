@@ -15,31 +15,31 @@ public:
     Expression *expression;
 
     Calculator();
-    void processPlugins(std::string path);
-    void connectPlugins();
-    ~Calculator();
+    ~Calculator();   
 
-    double runCalculating(std::string str);
-    void setExpression(std::string exp);
-    void processError();
-    std::string UnaryOperationsProcessing(std::string str); 
-   
-    //BaseOperation baseOperations;
-    static std::map<int, std::vector<Operation*>> oper_map;
+    double runCalculating(std::string str);      
+    static std::map<int, std::vector<Operation*>> operations_map;
 
 private:
-    std::vector<HMODULE> _libs;
+    std::vector<HMODULE> dll_libs;
     std::vector<Operation*> plugins;
 
     std::vector<std::string> valid_operations;
     std::vector<std::string> valid_functions;
 
+    void processPlugins(std::string path);
+    void connectPlugins();
+
     bool isLexemDefined(std::string lexem);
     bool isOperationDefined(std::string lexem);
     bool isFunctionDefined(std::string lexem);
 
+    void processError();
     bool processAlphaError(int *index);
     bool processOperationError(int * index);
+    void setExpression(std::string exp);
+    std::string unaryOperationsProcessing(std::string str);
+    
 };
 
 #endif //CALCULATOR_H

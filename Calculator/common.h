@@ -8,8 +8,9 @@
 #include <map>
 #include <vector>
 
-std::string substring(std::string s, int startPoint, int siz);
+std::string substring(std::string str, int startPoint, int siz);
 std::string replaceAll(const std::string& inputStr, const char *oldExp, const char *newExp);
 bool brack(std::string str);
 bool isNumber(std::string str);
+
 #endif //COMMON_H

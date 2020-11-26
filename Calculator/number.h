@@ -9,6 +9,7 @@ class Number : public  IExpression {
     std::string number;
 public:
     Number(std::string num);
+
     virtual double calculate();
 };
 

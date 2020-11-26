@@ -1,6 +1,5 @@
 #include "error.h"
 
-
 ErrorState::error_state_t ErrorState::calc_error = ErrorState::errorState::SUCCESS;
 
 ErrorState::error_state_t ErrorState::getErrorState() {

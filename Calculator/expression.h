@@ -1,12 +1,9 @@
 #ifndef EXPRESSION_H
 #define EXPRESSION_H
-#include <math.h>
-#include <iostream>
-#include <string> 
+
 #include "iexpression.h"
 #include "operations.h"
 #include "common.h"
-
 
 class Expression: public IExpression {
 private:
@@ -19,12 +16,11 @@ protected:
 public:
     Expression();
     Expression(std::string str);
+    ~Expression();
 
     Expression *getExpression();
+    double calculate();    
 
-    double calculate();
-    ~Expression();
-    
 protected:
     void processExpression(std::string str, int index);
     void addExpression(std::string str, IExpression *&place);
@@ -38,6 +34,5 @@ private:
     Operation* defineTrigonometry(std::string str);
     Operation * defineConstant(std::string str);
 };
-
 
 #endif //EXPRESSION_H

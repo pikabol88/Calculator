@@ -1,5 +1,6 @@
 #ifndef OPERATIONS_H
 #define OPERATIONS_H
+
 #include <math.h>
 #include <iostream>
 #include <string> 
@@ -7,15 +8,12 @@
 #include "iexpression.h"
 
  enum Priority {
-
     CONSTANT,
     ADD_SUB,
     MUL_DIV,
     POWER,
     FUNCTION,
-
 } ;
-
 
 class Operation {
 protected:
@@ -23,7 +21,6 @@ protected:
     std::string name;
 
 public: 
-    Operation();
     Operation(Priority operationPriority, std::string operationName);
     Priority getPriority();
     std::string getName();
@@ -31,7 +28,16 @@ public:
     virtual double execute(double left, double right) = 0;
 };
 
+class BaseOperation {
+public:
+    static char unary_minus;
+    static char double_unary_minus[];
+    static char unary_plus;
+    static char base_operations[];
+    static char right_bracket;
+    static char left_bracket;
 
+};
 
 class Addition: public Operation {
 public:
@@ -46,37 +52,13 @@ public:
     virtual Operation *getOperation();
     virtual double execute(double left, double right);
 };
-/*
-class Multiply : public Operation {
-public:
-    Multiply();
-    virtual Operation *getOperation();
-    virtual double execute(double left, double right);
-};
-*/
+
 class Division : public Operation {
 public:
     Division();
     virtual Operation *getOperation();
     virtual double execute(double left, double right);
 };
-
-/*
-class Power : public Operation {
-public:
-    Power();
-    virtual Operation *getOperation();
-    virtual double execute(double left, double right);
-};
-*/
-/*
-class Cosine : public Operation {
-public:
-    Cosine();
-    virtual Operation *getOperation();
-    virtual double execute(double left, double right);
-};
-*/
 
 class Sinus : public Operation {
 public:
@@ -91,26 +73,5 @@ public:
     virtual Operation *getOperation();
     virtual double execute(double left, double right);
 };
-
-
-
-
-
-
-
-
-class BaseOperation {
-public:
-    static char unary_minus;
-    static char double_unary_minus[];
-    static char unary_plus;
-    static char operations[];
-    static char right_bracket;
-    static char left_bracket;
-
-};
-
-
-
 
 #endif //OPERATIONS_H

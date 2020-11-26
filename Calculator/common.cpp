@@ -1,4 +1,4 @@
-#include"common.h"
+#include "common.h"
 
 std::string substring(std::string str, int startPoint, int size) {
     std::string newStr = "";

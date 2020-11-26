@@ -8,8 +8,9 @@ class IExpression {
 public:
     bool negative;
     bool unary;
-    Operation *operations;
-    //днаюбхрэ гюыхрс нр днаюбкемхъ б мюлаеп
+    Operation *base_operations;
+
+    //TO DO: safe handling of adding expressions to children
     virtual Expression *getExpression() { return 0; }
     virtual double calculate() { return 0; }
     virtual ~IExpression() {}

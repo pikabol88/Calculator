@@ -15,7 +15,7 @@ Expression::~Expression() {
 
 Operation* Expression::defineTrigonometry(std::string str) {
     std::string tmp;
-    std::vector<Operation*> expressions = (*Calculator::oper_map.find(Priority::FUNCTION)).second;
+    std::vector<Operation*> expressions = (*Calculator::operations_map.find(Priority::FUNCTION)).second;
     for (int i = 0;i < str.size();i++) {
         if (str[i] == BaseOperation::left_bracket) {
             tmp = substring(str, 0, i);
@@ -31,7 +31,7 @@ Operation* Expression::defineTrigonometry(std::string str) {
 }
 
 Operation* Expression::defineConstant(std::string str) {
-    std::vector<Operation*> expressions = (*Calculator::oper_map.find(Priority::CONSTANT)).second;    
+    std::vector<Operation*> expressions = (*Calculator::operations_map.find(Priority::CONSTANT)).second;    
     for (auto& el : expressions) {
         if (!(el->getName()).compare(str)) {
             return el->getOperation();
@@ -51,13 +51,13 @@ Expression* Expression:: getExpression() {
 
 double Expression::calculate() {
     double num;
-    if (operations == nullptr) {
+    if (base_operations == nullptr) {
         num = left->calculate();
     }
     else {
         if (!(right == nullptr)) { 
-            num = operations->execute(left->calculate(), right->calculate());
-        } else num = operations->execute(left->calculate(), 0);
+            num = base_operations->execute(left->calculate(), right->calculate());
+        } else num = base_operations->execute(left->calculate(), 0);
     }
     return (negative) ? num * (-1) : num;
 }
@@ -81,13 +81,13 @@ void Expression::parseExpression(const std::string str) {
 void Expression::processPower(const std::string str, bool *isActivated) {
     int brackets = 0;
     std::string tmp;
-    std::vector<Operation*> expressions = (*Calculator::oper_map.find(Priority::POWER)).second;
+    std::vector<Operation*> expressions = (*Calculator::operations_map.find(Priority::POWER)).second;
     for (int i = 0; i < str.length(); ++i) {
         tmp = str[i];
         if (brackets == 0) {
             for (auto& el : expressions) {
                 if (!(el->getName()).compare(tmp)) {
-                    operations = el->getOperation();
+                    base_operations = el->getOperation();
                     if (str[0] == BaseOperation::unary_minus) {
                         negative = true;
                         processExpression(substring(str, 1, str.length() - 1), i - 1);
@@ -108,13 +108,13 @@ void Expression::processPower(const std::string str, bool *isActivated) {
 void Expression::processFirstPriorityOperations(const std::string str, bool *isActivated) {
     int brackets = 0;
     std::string tmp;
-    std::vector<Operation*> expressions = (*Calculator::oper_map.find(Priority::MUL_DIV)).second;
+    std::vector<Operation*> expressions = (*Calculator::operations_map.find(Priority::MUL_DIV)).second;
     for (int i = 0; i < str.length(); ++i) {
         tmp = str[i];
         if (brackets == 0) {
             for (auto& el :expressions) {
                 if (!(el->getName()).compare(tmp)) {                    
-                    operations = el->getOperation();
+                    base_operations = el->getOperation();
                     processExpression(str, i);
                     *isActivated = true;
                     return;
@@ -131,13 +131,13 @@ void Expression::processFirstPriorityOperations(const std::string str, bool *isA
 void Expression::processSecondPriorityOperations(const std::string str, bool *isActivated) {
     int brackets = 0;
     std::string tmp;
-    std::vector<Operation*> expressions = (*Calculator::oper_map.find(Priority::ADD_SUB)).second;
+    std::vector<Operation*> expressions = (*Calculator::operations_map.find(Priority::ADD_SUB)).second;
     for (int i = 0; i < str.length(); ++i) {
         tmp = str[i];
         if (brackets == 0) {
             for (auto& el : expressions) {                
                 if (!(el->getName()).compare(tmp)) {
-                    operations = el->getOperation();
+                    base_operations = el->getOperation();
                     processExpression(str, i);
                     *isActivated = true;
                     return;
