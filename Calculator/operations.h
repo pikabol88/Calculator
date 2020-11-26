@@ -39,39 +39,4 @@ public:
 
 };
 
-class Addition: public Operation {
-public:
-    Addition();
-    virtual Operation *getOperation();
-    virtual double execute(double left, double right);
-};
-
-class Subtraction : public Operation {
-public:
-    Subtraction();
-    virtual Operation *getOperation();
-    virtual double execute(double left, double right);
-};
-
-class Division : public Operation {
-public:
-    Division();
-    virtual Operation *getOperation();
-    virtual double execute(double left, double right);
-};
-
-class Sinus : public Operation {
-public:
-    Sinus();
-    virtual Operation *getOperation();
-    virtual double execute(double left, double right);
-};
-
-class Pi : public Operation {
-public:
-    Pi();
-    virtual Operation *getOperation();
-    virtual double execute(double left, double right);
-};
-
 #endif //OPERATIONS_H
