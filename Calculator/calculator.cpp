@@ -7,9 +7,9 @@ std::map<int, std::vector<Operation*>> Calculator::operations_map = {};
 Calculator::Calculator() {
 
 #ifdef _DEBUG
-    const char* path = "../PluginDll/Debug";
+    const char* path = "../PluginDll/DebugPlugins";
 #else
-    const char* path = "../PluginDll/Release";
+    const char* path = "../PluginDll/ReleasePlugins";
 #endif // DEBUG
 
     processPlugins(path);
