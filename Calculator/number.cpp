@@ -3,7 +3,6 @@
 Number::Number(std::string num) {
     number = num;
     negative = false;
-
 }
 
 double Number::calculate() {

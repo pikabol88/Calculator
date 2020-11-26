@@ -36,6 +36,7 @@ private:
     void processFirstPriorityOperations(const std::string str, bool * isActivated);
     void processBrackets(const std::string str, bool * isActivated);
     Operation* defineTrigonometry(std::string str);
+    Operation * defineConstant(std::string str);
 };
 
 

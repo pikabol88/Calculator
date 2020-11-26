@@ -1,5 +1,7 @@
 #include "calculator.h"
 
+
+typedef Operation* (*load)();
 std::map<int, std::vector<Operation*>> Calculator::oper_map = {};
 
 void Calculator::setExpression(std::string exp) {
@@ -7,7 +9,7 @@ void Calculator::setExpression(std::string exp) {
     ErrorState::setErrorState(ErrorState::SUCCESS);
     processError();
     if (ErrorState::isSuccess()) {
-        if (expression == nullptr) {
+        if (expression != nullptr) {
             free(expression);
         }
         expression = new Expression(exp);
@@ -142,48 +144,83 @@ double Calculator::runCalculating(std::string str) {
 
 
 Calculator::Calculator() {
-    Operation *element;
+
+#ifdef _DEBUG
+    const char* path = "../PluginDll/Debug";
+#else
+    const char* path = "../PluginDll/Release";
+#endif // DEBUG
+    processPlugins(path);
+    connectPlugins();
+   
+}
+
+void Calculator::processPlugins(std::string path) {
+    std::filesystem::directory_iterator folder(path);
+    std::cout << "Connected plugins:" << std::endl;
+
+    for (auto& dll : folder) {
+        if (dll.path().extension().string() != ".dll") {
+            continue;
+        }
+
+        HMODULE dlllib = LoadLibrary(dll.path().string().c_str());
+        if (!dlllib) {
+            std::cout << "Unable to connect " << dll.path().filename().string() << std::endl;
+            continue;
+        }
+        load loadOperation = (load)GetProcAddress(dlllib, "defineOperation");
+        if (!loadOperation) {
+            std::cout << "Unable to load plugin from " << dll.path().filename().string() << std::endl;
+            FreeLibrary(dlllib);
+            continue;
+        }
+        _libs.push_back(dlllib);
+        plugins.push_back(loadOperation());
+        std::cout << "\t- " << dll.path().filename().string()<<std::endl;
+    }
+    std::cout << "\n";
+}
+
+void Calculator::connectPlugins() {
+
     std::vector<Operation*> add_sub;
-
-    element = new Addition();
-    valid_operations.push_back(element->getName());
-    add_sub.push_back(element);
-
-    element = new Subtraction();
-    valid_operations.push_back(element->getName());
-    add_sub.push_back(new Subtraction());
-
     std::vector<Operation*> mul_div;
-
-    element = new Multiply();
-    valid_operations.push_back(element->getName());
-    mul_div.push_back(new Multiply());
-
-    element = new Division();
-    valid_operations.push_back(element->getName());
-    mul_div.push_back(new Division());
-
-    std::vector<Operation*> pov;
-
-    element = new Power();
-    valid_operations.push_back(element->getName());
-    pov.push_back(new Power());
-
-
+    std::vector<Operation*> power;
     std::vector<Operation*> fun;
-    element = new Cosine();
-    valid_functions.push_back(element->getName());
-    fun.push_back(new Cosine());
+    std::vector<Operation*> constant;
 
-    element = new Sinus();
-    valid_functions.push_back(element->getName());
-    fun.push_back(new Sinus());
-
-
-    oper_map.insert(make_pair(priority::ADD_SUB, add_sub));
-    oper_map.insert(make_pair(priority::MUL_DIV, mul_div));
-    oper_map.insert(make_pair(priority::POWER, pov));
-    oper_map.insert(make_pair(priority::FUNCTION, fun));
+    for (auto& el : plugins) {
+        switch (el->getPriority()) {
+        case Priority::ADD_SUB:
+            add_sub.push_back(el->getOperation());
+            valid_operations.push_back(el->getName());
+            break;
+        case Priority::MUL_DIV:
+            mul_div.push_back(el->getOperation());
+            valid_operations.push_back(el->getName());
+            break;
+        case Priority::POWER:
+            power.push_back(el->getOperation());
+            valid_operations.push_back(el->getName());
+            break;
+        case Priority::FUNCTION:
+            valid_functions.push_back(el->getName());
+            fun.push_back(el->getOperation());
+            break;
+        case Priority::CONSTANT:
+            valid_functions.push_back(el->getName());
+            constant.push_back(el->getOperation());
+            break;
+        default:
+            break;
+        }
+    }
+    oper_map.insert(make_pair(Priority::ADD_SUB, add_sub));
+    oper_map.insert(make_pair(Priority::MUL_DIV, mul_div));
+    oper_map.insert(make_pair(Priority::POWER, power));
+    oper_map.insert(make_pair(Priority::FUNCTION, fun));
+    oper_map.insert(make_pair(Priority::CONSTANT, constant));
 }
 
 Calculator::~Calculator() {
@@ -192,6 +229,9 @@ Calculator::~Calculator() {
         for (auto& vec_el : map_el.second) {
             delete vec_el;
         }
+    }
+    for (auto &lib : _libs) {
+        FreeLibrary(lib);
     }
 }
 

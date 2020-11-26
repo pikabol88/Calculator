@@ -5,6 +5,9 @@
 #include "expression.h"
 #include "error.h"
 #include "common.h"
+#include <Windows.h>
+#include <filesystem>
+
 
 class Calculator {
 public:
@@ -12,6 +15,8 @@ public:
     Expression *expression;
 
     Calculator();
+    void processPlugins(std::string path);
+    void connectPlugins();
     ~Calculator();
 
     double runCalculating(std::string str);
@@ -23,6 +28,8 @@ public:
     static std::map<int, std::vector<Operation*>> oper_map;
 
 private:
+    std::vector<HMODULE> _libs;
+    std::vector<Operation*> plugins;
 
     std::vector<std::string> valid_operations;
     std::vector<std::string> valid_functions;

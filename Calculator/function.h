@@ -9,7 +9,13 @@
 class Function : public Expression {   
 public:
     IExpression* expression;
-    Function(std::string str, Operation *oper);
+    Function(std::string str, Operation *fun);
+    double calculate();
+};
+
+class Constant : public Expression {
+public:
+    Constant(Operation *constant);
     double calculate();
 };
 

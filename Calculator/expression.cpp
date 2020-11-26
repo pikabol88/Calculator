@@ -15,7 +15,7 @@ Expression::~Expression() {
 
 Operation* Expression::defineTrigonometry(std::string str) {
     std::string tmp;
-    std::vector<Operation*> expressions = (*Calculator::oper_map.find(priority::FUNCTION)).second;
+    std::vector<Operation*> expressions = (*Calculator::oper_map.find(Priority::FUNCTION)).second;
     for (int i = 0;i < str.size();i++) {
         if (str[i] == BaseOperation::left_bracket) {
             tmp = substring(str, 0, i);
@@ -25,6 +25,16 @@ Operation* Expression::defineTrigonometry(std::string str) {
     for (auto& el : expressions) {        
         if (!(el->getName()).compare(tmp)) {
            return el->getOperation();
+        }
+    }
+    return nullptr;
+}
+
+Operation* Expression::defineConstant(std::string str) {
+    std::vector<Operation*> expressions = (*Calculator::oper_map.find(Priority::CONSTANT)).second;    
+    for (auto& el : expressions) {
+        if (!(el->getName()).compare(str)) {
+            return el->getOperation();
         }
     }
     return nullptr;
@@ -71,7 +81,7 @@ void Expression::parseExpression(const std::string str) {
 void Expression::processPower(const std::string str, bool *isActivated) {
     int brackets = 0;
     std::string tmp;
-    std::vector<Operation*> expressions = (*Calculator::oper_map.find(priority::POWER)).second;
+    std::vector<Operation*> expressions = (*Calculator::oper_map.find(Priority::POWER)).second;
     for (int i = 0; i < str.length(); ++i) {
         tmp = str[i];
         if (brackets == 0) {
@@ -98,7 +108,7 @@ void Expression::processPower(const std::string str, bool *isActivated) {
 void Expression::processFirstPriorityOperations(const std::string str, bool *isActivated) {
     int brackets = 0;
     std::string tmp;
-    std::vector<Operation*> expressions = (*Calculator::oper_map.find(priority::MUL_DIV)).second;
+    std::vector<Operation*> expressions = (*Calculator::oper_map.find(Priority::MUL_DIV)).second;
     for (int i = 0; i < str.length(); ++i) {
         tmp = str[i];
         if (brackets == 0) {
@@ -121,7 +131,7 @@ void Expression::processFirstPriorityOperations(const std::string str, bool *isA
 void Expression::processSecondPriorityOperations(const std::string str, bool *isActivated) {
     int brackets = 0;
     std::string tmp;
-    std::vector<Operation*> expressions = (*Calculator::oper_map.find(priority::ADD_SUB)).second;
+    std::vector<Operation*> expressions = (*Calculator::oper_map.find(Priority::ADD_SUB)).second;
     for (int i = 0; i < str.length(); ++i) {
         tmp = str[i];
         if (brackets == 0) {
@@ -173,11 +183,11 @@ void Expression::addExpression(std::string str, IExpression *&place) {
     bool minus_after_bracket = false;
     std::string func;
     if (str[0] == BaseOperation::unary_minus) {
-        str = substring(str, 1, str.length()-1);
+        str = substring(str, 1, str.length() - 1);
         first_minus = true;
     }
     std::string tmp = str;
-    if (str[0] == BaseOperation::left_bracket) {       
+    if (str[0] == BaseOperation::left_bracket) {
         tmp = substring(tmp, 1, tmp.length() - 2);
         if (str[1] == BaseOperation::unary_minus) {
             tmp = std::regex_replace(tmp, unary_minus, "");
@@ -188,18 +198,23 @@ void Expression::addExpression(std::string str, IExpression *&place) {
     if (opertmp) {
         place = new Function(tmp, opertmp);
         place->negative = first_minus;
-    }    
+        return;
+    }
+    opertmp = defineConstant(str);
+    if (opertmp) {
+        place = new Constant(opertmp);
+        place->negative = first_minus;
+        return;
+    }
+    if (isNumber(tmp)) {
+        tmp = std::regex_replace(tmp, unary_minus, "");
+        place = new Number(tmp);
+        if (first_minus || minus_after_bracket) {
+            place->negative = true;
+        }
+    }
     else {
-        if (isNumber(tmp)) {
-            tmp = std::regex_replace(tmp, unary_minus, "");
-            place = new Number(tmp);
-            if (first_minus || minus_after_bracket) {
-                place->negative = true;
-            }
-        }
-        else {
-            place = new Expression(str);
-            place->negative = first_minus;
-        }
+        place = new Expression(str);
+        place->negative = first_minus;
     }
 }

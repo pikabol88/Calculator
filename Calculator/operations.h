@@ -3,27 +3,29 @@
 #include <math.h>
 #include <iostream>
 #include <string> 
-#include<regex>
+#include <regex>
 #include "iexpression.h"
 
-typedef enum priority {
+ enum Priority {
+
     CONSTANT,
     ADD_SUB,
     MUL_DIV,
     POWER,
     FUNCTION,
-} priority_t;
+
+} ;
 
 
 class Operation {
 protected:
-    priority_t priority;
+    Priority prior;
     std::string name;
-    bool isFunction;
 
 public: 
-    Operation(priority_t operationPriority, std::string operationName, bool isFunction);
-    priority_t getPriority();
+    Operation();
+    Operation(Priority operationPriority, std::string operationName);
+    Priority getPriority();
     std::string getName();
     virtual Operation* getOperation() = 0;
     virtual double execute(double left, double right) = 0;
@@ -44,14 +46,14 @@ public:
     virtual Operation *getOperation();
     virtual double execute(double left, double right);
 };
-
+/*
 class Multiply : public Operation {
 public:
     Multiply();
     virtual Operation *getOperation();
     virtual double execute(double left, double right);
 };
-
+*/
 class Division : public Operation {
 public:
     Division();
@@ -59,25 +61,33 @@ public:
     virtual double execute(double left, double right);
 };
 
+/*
 class Power : public Operation {
 public:
     Power();
     virtual Operation *getOperation();
     virtual double execute(double left, double right);
 };
-
-
+*/
+/*
 class Cosine : public Operation {
 public:
     Cosine();
     virtual Operation *getOperation();
     virtual double execute(double left, double right);
 };
-
+*/
 
 class Sinus : public Operation {
 public:
     Sinus();
+    virtual Operation *getOperation();
+    virtual double execute(double left, double right);
+};
+
+class Pi : public Operation {
+public:
+    Pi();
     virtual Operation *getOperation();
     virtual double execute(double left, double right);
 };

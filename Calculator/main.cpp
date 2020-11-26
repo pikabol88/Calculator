@@ -9,10 +9,14 @@ int main() {
     std::string str;
     Calculator calculator;
     double result;
+    std::cout << "enter the expression:\n";
     while (std::getline(std::cin, str)) {
+        
         result = calculator.runCalculating(str);
         if (ErrorState::isSuccess()) {
+            std::cout << "answer:\n";
             std::cout << result << "\n\n";
+            std::cout << "enter the expression:\n";
         }
         else {
             std::cout << ErrorState::getErrorMessage()<<"\n";
