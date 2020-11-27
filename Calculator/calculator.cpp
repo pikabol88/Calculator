@@ -176,7 +176,9 @@ bool Calculator::isOperationUnaryMinus(std::string lexem) {
 
 bool Calculator::isFunctionDefined(std::string lexem) {
     for (auto& el : valid_functions) {
-        if (!el.compare(lexem)) { return true; }
+        if (!el.compare(lexem)) { 
+            return true; 
+        }
     }
     return false;
 }
@@ -188,9 +190,18 @@ void Calculator::processError() {
     bool previosIsPoint = false;
     bool previosIsAlpha = false;
     bool previosIsBracket = false;
-    
+    if (!isalpha(str_exp[0]) && !isdigit(str_exp[0])) {
+        if (str_exp[0] != BaseOperation::left_bracket&&str_exp[0] != BaseOperation::unary_minus) {
+            ErrorState::setErrorState(ErrorState::ERROR_OPERATION);
+            return;
+        }
+    }
     for (int i = 0; i < str_exp.size(); i++) {
         while (isdigit(str_exp[i])) {
+            if (previosIsAlpha) {
+                ErrorState::setErrorState(ErrorState::ERROR_FUNCTION);
+                return;
+            }
             previosIsAlpha = previosIsBracket = false;
             isDigit = true;
             i++;
@@ -199,24 +210,25 @@ void Calculator::processError() {
         if (str_exp[i] == '.') {
             if (previosIsPoint||previosIsAlpha||previosIsBracket) {
                 ErrorState::setErrorState(ErrorState::ERROR_POINT);
-                break;
+                return;
             }
             if (!(i > 0 && isdigit(str_exp[i - 1])) && !(i < str_exp.size() - 1 && isdigit(str_exp[i + 1]))) {
                 ErrorState::setErrorState(ErrorState::ERROR_POINT);
-                    break;
+                return;
             }
             previosIsPoint = true;
         } else {
             previosIsPoint = false;
             if (str_exp[i] == '(') {
                 previosIsBracket = true;
+                previosIsAlpha = false;
                 left_bracket++;
                 isDigit = false;
                 continue;
             } else if (str_exp[i] == ')') {
                 previosIsBracket = true;
                 right_bracket++;
-                if (!isDigit) {
+                if (!isDigit&&!previosIsAlpha) {
                     ErrorState::setErrorState(ErrorState::ERROR_EMPTY_BRACKETS);
                     break;
                 }
@@ -233,6 +245,7 @@ void Calculator::processError() {
                     }
                 }
                 ErrorState::setErrorState(ErrorState::ERROR_OPERATION);
+                return;
             }
             else {
                 if (processOperationError(&i)) break;
@@ -241,11 +254,13 @@ void Calculator::processError() {
         }
         if (right_bracket > left_bracket) {
             ErrorState::setErrorState(ErrorState::ERROR_BRACKETS);
+            return;
         }
     }
     if (ErrorState::isSuccess()) {
         if (left_bracket != right_bracket) {
             ErrorState::setErrorState(ErrorState::ERROR_BRACKETS);
+            return;
         }
     }
 }
@@ -269,4 +284,3 @@ Calculator::~Calculator() {
         FreeLibrary(lib);
     }
 }
-

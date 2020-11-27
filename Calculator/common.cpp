@@ -26,7 +26,7 @@ bool brack(std::string str) {
 bool isNumber(std::string str) {
     std::regex rx("_");
     int place = str.find_first_of("*/-+^()");
-    if (place < 0) {
+    if (place < 0&&!isalpha(str[0])) {
         return true;
     }
     return false;
