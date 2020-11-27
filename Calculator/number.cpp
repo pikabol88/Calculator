@@ -1,6 +1,6 @@
 #include "number.h"
 
-Number::Number(std::string num) {
+Number::Number(const std::string &num) {
     number = num;
     negative = false;
 }

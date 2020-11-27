@@ -1,10 +1,14 @@
 #include "function.h"
 
-Function::Function(std::string str, Operation *fun) {
+Function::Function(const std::string &str, Operation  *fun) {
     base_operations = fun;
     int i = 0;
     while (isalpha(str[i])) i++;
     addExpression(substring(str, i, str.length() - i), this->expression);
+}
+
+Function::~Function() {
+    delete expression;
 }
 
 double Function::calculate() {   
@@ -12,7 +16,7 @@ double Function::calculate() {
     return  (negative) ? num * (-1) : num;
 }
 
-Constant::Constant(Operation * constant) {
+Constant::Constant(  Operation * constant) {
     base_operations = constant;
 }
 

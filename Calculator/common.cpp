@@ -1,6 +1,6 @@
 #include "common.h"
 
-std::string substring(std::string str, int startPoint, int size) {
+std::string substring(std::string const &str, const int startPoint, const int size) {
     std::string newStr = "";
     for (int i = 0; i < size; ++i)
         newStr += str[startPoint + i];

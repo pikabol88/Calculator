@@ -6,7 +6,7 @@ ErrorState::error_state_t ErrorState::getErrorState() {
     return calc_error;
 }
 
-void ErrorState::setErrorState(error_state_t error) {
+void ErrorState::setErrorState(error_state_t const &error) {
     calc_error = error;
 }
 

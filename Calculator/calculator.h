@@ -14,32 +14,45 @@ public:
     std::string str_exp;
     Expression *expression;
 
-    Calculator();
+    Calculator();    
     ~Calculator();   
 
-    double runCalculating(std::string str);      
+    double runCalculating(std::string &str);    
     static std::map<int, std::vector<Operation*>> operations_map;
 
 private:
+
+    typedef enum symbol {
+        DIGIT,
+        FLOAT_POINT,
+        ALPHA,
+        BRACKET,
+        NULLIC,
+        OPERATION,
+    }symbol_t;
+
     std::vector<HMODULE> dll_libs;
     std::vector<Operation*> plugins;
 
     std::vector<std::string> valid_operations;
     std::vector<std::string> valid_functions;
 
-    void processPlugins(std::string path);
+    void processPlugins(std::string const & path);
     void connectPlugins();
 
-    bool isLexemDefined(std::string lexem);
-    bool isOperationDefined(std::string lexem);
-    bool isOperationUnaryMinus(std::string lexem);
-    bool isFunctionDefined(std::string lexem);
+    void setExpression(std::string const & exp);
 
+    bool processExpressionBeg();
+    bool processPointError(symbol_t * previos, const int index);
     void processError();
     bool processAlphaError(int *index);
     bool processOperationError(int * index);
-    void setExpression(std::string exp);
-    std::string unaryOperationsProcessing(std::string str);
+    bool isLexemDefined(std::string const & lexem);
+    bool isOperationDefined(std::string const & lexem);
+    bool isOperationUnaryMinus(std::string const & lexem);
+    bool isFunctionDefined(std::string const & lexem);
+
+    std::string unaryOperationsProcessing(std::string &str);
     
 };
 

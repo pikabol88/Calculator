@@ -15,22 +15,22 @@ protected:
 
 public:
     Expression();
-    Expression(std::string str);
+    Expression(const std::string  &str);
     ~Expression();
 
     Expression *getExpression();
     double calculate();    
 
 protected:
-    void processExpression(std::string str, int index);
-    void addExpression(std::string str, IExpression *&place);
+    void processExpression(const std::string &str, int index);
+    void addExpression(std::string str, IExpression *& place);
 
 private:
-    void parseExpression(const std::string str);
-    void processPower(const std::string str, bool * isActivated);
-    void processSecondPriorityOperations(const std::string str, bool * isActivated);
-    void processFirstPriorityOperations(const std::string str, bool * isActivated);
-    void processBrackets(const std::string str, bool * isActivated);
+    void parseExpression(const std::string &str);
+    void processPower(const std::string &str, bool * isActivated);
+    void processSecondPriorityOperations(const std::string &str, bool * isActivated);
+    void processFirstPriorityOperations(const std::string &str, bool * isActivated);
+    void processBrackets(const std::string &str, bool * isActivated);
     Operation* defineTrigonometry(std::string str);
     Operation * defineConstant(std::string str);
 };

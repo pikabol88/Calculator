@@ -13,7 +13,7 @@ public:
     //TO DO: safe handling of adding expressions to children
     virtual Expression *getExpression() { return 0; }
     virtual double calculate() { return 0; }
-    virtual ~IExpression() {}
+    virtual ~IExpression() { delete base_operations; }
 };
 
 #endif //IEXPRESSION_H

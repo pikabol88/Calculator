@@ -16,7 +16,7 @@ Calculator::Calculator() {
     connectPlugins();
 }
 
-void Calculator::processPlugins(std::string path) {
+void Calculator::processPlugins(std::string const &path) {
     std::filesystem::directory_iterator folder(path);
     std::cout << "Connected plugins:" << std::endl;
 
@@ -84,7 +84,7 @@ void Calculator::connectPlugins() {
     operations_map.insert(make_pair(Priority::CONSTANT, constant));
 }
 
-void Calculator::setExpression(std::string exp) {
+void Calculator::setExpression(std::string const &exp) {
     str_exp = exp;
     ErrorState::setErrorState(ErrorState::SUCCESS);
     processError();
@@ -96,7 +96,15 @@ void Calculator::setExpression(std::string exp) {
     }
 }
 
-std::string Calculator::unaryOperationsProcessing(std::string str) {
+double Calculator::runCalculating(std::string &str) {
+    str = unaryOperationsProcessing(str);
+    setExpression(str);
+    if (ErrorState::isSuccess()) {
+        return  expression->calculate();
+    }
+}
+
+std::string Calculator::unaryOperationsProcessing(std::string &str) {
     int i = 0;
     str = replaceAll(str, " ", "");
     int size = str.length();
@@ -154,12 +162,12 @@ bool Calculator::processOperationError(int *index) {
     return false;
 }
 
-bool Calculator::isLexemDefined(std::string lexem) {
+bool Calculator::isLexemDefined(std::string const &lexem) {
     if (isalpha(lexem[0])) return isFunctionDefined(lexem);
     else return isOperationDefined(lexem);
 }
 
-bool Calculator::isOperationDefined(std::string lexem) {
+bool Calculator::isOperationDefined(std::string const &lexem) {
     for (auto& el : valid_operations) {
         if (!el.compare(lexem)) { return true; }
     }
@@ -167,14 +175,14 @@ bool Calculator::isOperationDefined(std::string lexem) {
     return false;
 } 
 
-bool Calculator::isOperationUnaryMinus(std::string lexem) {
+bool Calculator::isOperationUnaryMinus(std::string const &lexem) {
     if (lexem[0] == BaseOperation::unary_minus) {
         return true;
     }
     return false;
 }
 
-bool Calculator::isFunctionDefined(std::string lexem) {
+bool Calculator::isFunctionDefined(std::string const &lexem) {
     for (auto& el : valid_functions) {
         if (!el.compare(lexem)) { 
             return true; 
@@ -183,80 +191,92 @@ bool Calculator::isFunctionDefined(std::string lexem) {
     return false;
 }
 
-void Calculator::processError() {
-    int left_bracket = 0;
-    int right_bracket = 0;
-    bool isDigit = false;
-    bool previosIsPoint = false;
-    bool previosIsAlpha = false;
-    bool previosIsBracket = false;
+bool Calculator::processExpressionBeg() {
     if (!isalpha(str_exp[0]) && !isdigit(str_exp[0])) {
         if (str_exp[0] != BaseOperation::left_bracket&&str_exp[0] != BaseOperation::unary_minus) {
             ErrorState::setErrorState(ErrorState::ERROR_OPERATION);
-            return;
+            return true;
         }
     }
+    return false;
+}
+
+bool Calculator::processPointError(symbol_t * previos, const int index) {
+    if (*(previos) == BRACKET || *(previos) == ALPHA || *(previos) == FLOAT_POINT) {
+        ErrorState::setErrorState(ErrorState::ERROR_POINT);
+        return true;
+    }
+    if (!(index > 0 && isdigit(str_exp[index - 1])) && !(index < str_exp.size() - 1 && isdigit(str_exp[index + 1]))) {
+        ErrorState::setErrorState(ErrorState::ERROR_POINT);
+        return true;
+    }
+    *(previos) = FLOAT_POINT;
+    return false;
+}
+
+
+void Calculator::processError() {
+    int left_bracket = 0;
+    int right_bracket = 0;
+    symbol_t previos = NULLIC;
+
+    bool isDigit = false;
+
+    if (processExpressionBeg()) return;
+
     for (int i = 0; i < str_exp.size(); i++) {
         while (isdigit(str_exp[i])) {
-            if (previosIsAlpha) {
+            isDigit = true;
+            if (previos == ALPHA) {
                 ErrorState::setErrorState(ErrorState::ERROR_FUNCTION);
                 return;
             }
-            previosIsAlpha = previosIsBracket = false;
-            isDigit = true;
+            previos = DIGIT;
             i++;
         }
-        if (i >= str_exp.size())  break;
-        if (str_exp[i] == '.') {
-            if (previosIsPoint||previosIsAlpha||previosIsBracket) {
-                ErrorState::setErrorState(ErrorState::ERROR_POINT);
+
+        if (i >= str_exp.size())  return;
+
+        if (str_exp[i] == '.') {  if (processPointError(&previos, i)) return; } 
+        if (str_exp[i] == '(') {
+            previos = BRACKET;
+            left_bracket++;
+            continue;
+        } 
+        if (str_exp[i] == ')') {
+            previos = BRACKET;
+            right_bracket++;
+            if (!isDigit&&!previos==ALPHA) {
+                ErrorState::setErrorState(ErrorState::ERROR_EMPTY_BRACKETS);
                 return;
             }
-            if (!(i > 0 && isdigit(str_exp[i - 1])) && !(i < str_exp.size() - 1 && isdigit(str_exp[i + 1]))) {
-                ErrorState::setErrorState(ErrorState::ERROR_POINT);
-                return;
-            }
-            previosIsPoint = true;
-        } else {
-            previosIsPoint = false;
-            if (str_exp[i] == '(') {
-                previosIsBracket = true;
-                previosIsAlpha = false;
-                left_bracket++;
-                isDigit = false;
-                continue;
-            } else if (str_exp[i] == ')') {
-                previosIsBracket = true;
-                right_bracket++;
-                if (!isDigit&&!previosIsAlpha) {
-                    ErrorState::setErrorState(ErrorState::ERROR_EMPTY_BRACKETS);
-                    break;
-                }
-                continue;
-            } else if (isalpha(str_exp[i])) {
-                previosIsAlpha = true;
-                if (processAlphaError(&i)) break;
-                continue;
-            }
-            if (isOperationUnaryMinus(&str_exp[i])) {
-                if (i < str_exp.size() - 1) {
-                    if (isdigit(str_exp[i + 1]) || isalpha(str_exp[i + 1]) || str_exp[i + 1] == BaseOperation::left_bracket) {
-                        continue;
-                    }
-                }
-                ErrorState::setErrorState(ErrorState::ERROR_OPERATION);
-                return;
-            }
-            else {
-                if (processOperationError(&i)) break;
-                previosIsAlpha = previosIsBracket = false;
-            }
+            continue;
         }
+        if (isalpha(str_exp[i])) {
+            previos = ALPHA;
+            if (processAlphaError(&i)) return;
+            continue;
+        }
+        if (isOperationUnaryMinus(&str_exp[i])) {
+            if (i < str_exp.size() - 1) {
+                if (isdigit(str_exp[i + 1]) || isalpha(str_exp[i + 1]) || str_exp[i + 1] == BaseOperation::left_bracket) {
+                    continue;
+                }
+            }
+            ErrorState::setErrorState(ErrorState::ERROR_OPERATION);
+            return;
+        }
+        else {
+            if (processOperationError(&i)) return;
+            previos = OPERATION;
+                    
+        }        
         if (right_bracket > left_bracket) {
             ErrorState::setErrorState(ErrorState::ERROR_BRACKETS);
             return;
         }
     }
+
     if (ErrorState::isSuccess()) {
         if (left_bracket != right_bracket) {
             ErrorState::setErrorState(ErrorState::ERROR_BRACKETS);
@@ -265,13 +285,7 @@ void Calculator::processError() {
     }
 }
 
-double Calculator::runCalculating(std::string str) {
-    str = unaryOperationsProcessing(str);
-    setExpression(str);
-    if (ErrorState::isSuccess()) {
-        return  expression->calculate();
-    }
-}
+
 
 Calculator::~Calculator() {
     delete expression;

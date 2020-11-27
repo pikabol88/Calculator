@@ -40,7 +40,7 @@ Operation* Expression::defineConstant(std::string str) {
     return nullptr;
 }
 
-Expression::Expression(std::string str){
+Expression::Expression(const std::string  &str){
     negative = false;
     parseExpression(str);
 }
@@ -63,7 +63,7 @@ double Expression::calculate() {
 }
 
 
-void Expression::parseExpression(const std::string str) {    
+void Expression::parseExpression(const std::string &str) {    
     bool isRecurtionActivated = false;
 
     processBrackets(str, &isRecurtionActivated);
@@ -78,7 +78,7 @@ void Expression::parseExpression(const std::string str) {
     processExpression(str, str.length());
 }
 
-void Expression::processPower(const std::string str, bool *isActivated) {
+void Expression::processPower(const std::string &str, bool *isActivated) {
     int brackets = 0;
     std::string tmp;
     std::vector<Operation*> expressions = (*Calculator::operations_map.find(Priority::POWER)).second;
@@ -105,7 +105,7 @@ void Expression::processPower(const std::string str, bool *isActivated) {
 }
 
 
-void Expression::processFirstPriorityOperations(const std::string str, bool *isActivated) {
+void Expression::processFirstPriorityOperations(const std::string &str, bool *isActivated) {
     int brackets = 0;
     std::string tmp;
     std::vector<Operation*> expressions = (*Calculator::operations_map.find(Priority::MUL_DIV)).second;
@@ -128,7 +128,7 @@ void Expression::processFirstPriorityOperations(const std::string str, bool *isA
 
 
 
-void Expression::processSecondPriorityOperations(const std::string str, bool *isActivated) {
+void Expression::processSecondPriorityOperations(const std::string &str, bool *isActivated) {
     int brackets = 0;
     std::string tmp;
     std::vector<Operation*> expressions = (*Calculator::operations_map.find(Priority::ADD_SUB)).second;
@@ -150,7 +150,7 @@ void Expression::processSecondPriorityOperations(const std::string str, bool *is
 }
 
 
-void Expression::processBrackets(const std::string str, bool *isActivated) {
+void Expression::processBrackets(const std::string &str, bool *isActivated) {
     if (str[0] == BaseOperation::left_bracket && str[str.length() - 1] == BaseOperation::right_bracket && brack(substring(str, 1, str.length() - 2))) {
         *isActivated = true;
         return parseExpression(substring(str, 1, str.length() - 2));
@@ -163,7 +163,7 @@ void Expression::processBrackets(const std::string str, bool *isActivated) {
 }
 
 
-void Expression::processExpression(std::string str, int index) {
+void Expression::processExpression(const std::string &str, int index) {
     std::string substrl = substring(str, 0, index);
     std::string substrr = substring(str, index + 1, str.length() - index - 1);
     if(!substrl.empty()) addExpression(substrl, this->left);

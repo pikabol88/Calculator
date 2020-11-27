@@ -21,7 +21,8 @@ protected:
     std::string name;
 
 public: 
-    Operation(Priority operationPriority, std::string operationName);
+   // Operation(Priority operationPriority, std::string operationName);
+    Operation(Priority const & operationPriority, std::string const & operationName);
     Priority getPriority();
     std::string getName();
     virtual Operation* getOperation() = 0;
