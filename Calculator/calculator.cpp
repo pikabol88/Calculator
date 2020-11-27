@@ -124,6 +124,8 @@ std::string Calculator::unaryOperationsProcessing(std::string &str) {
     }
     std::string newStr = replaceAll(str, "#", "");
     newStr = replaceAll(newStr, "__", "");
+    newStr = replaceAll(newStr, "__", "");
+    newStr = replaceAll(newStr, "_\\(_", "(");
     return newStr;
 }
 
@@ -227,29 +229,38 @@ void Calculator::processError() {
     for (int i = 0; i < str_exp.size(); i++) {
         while (isdigit(str_exp[i])) {
             isDigit = true;
-            if (previos == ALPHA) {
+            if (previos == ALPHA|| previos==RIGHT_BRACKET) {
                 ErrorState::setErrorState(ErrorState::ERROR_FUNCTION);
                 return;
             }
             previos = DIGIT;
             i++;
         }
+        if (right_bracket > left_bracket) {
+            ErrorState::setErrorState(ErrorState::ERROR_BRACKETS);
+            return;
+        }
 
         if (i >= str_exp.size())  return;
 
         if (str_exp[i] == '.') {  if (processPointError(&previos, i)) return; } 
         if (str_exp[i] == '(') {
-            previos = BRACKET;
+            if ( previos == DIGIT) {
+                ErrorState::setErrorState(ErrorState::ERROR_BRACKETS);
+                return;
+            }
+            isDigit = false;
+            previos = LEFT_BRACKET;
             left_bracket++;
             continue;
         } 
-        if (str_exp[i] == ')') {
-            previos = BRACKET;
+        if (str_exp[i] == ')') {            
             right_bracket++;
-            if (!isDigit&&!previos==ALPHA) {
+            if (!isDigit && previos!=ALPHA) {
                 ErrorState::setErrorState(ErrorState::ERROR_EMPTY_BRACKETS);
                 return;
             }
+            previos = RIGHT_BRACKET;
             continue;
         }
         if (isalpha(str_exp[i])) {
@@ -271,10 +282,7 @@ void Calculator::processError() {
             previos = OPERATION;
                     
         }        
-        if (right_bracket > left_bracket) {
-            ErrorState::setErrorState(ErrorState::ERROR_BRACKETS);
-            return;
-        }
+        
     }
 
     if (ErrorState::isSuccess()) {

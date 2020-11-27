@@ -12,6 +12,7 @@ private:
 
 protected:
     std::string operation;
+    std::string full;
 
 public:
     Expression();

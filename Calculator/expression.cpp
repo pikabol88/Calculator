@@ -41,6 +41,7 @@ Operation* Expression::defineConstant(std::string str) {
 }
 
 Expression::Expression(const std::string  &str){
+    full = str;
     negative = false;
     parseExpression(str);
 }
@@ -82,7 +83,8 @@ void Expression::processPower(const std::string &str, bool *isActivated) {
     int brackets = 0;
     std::string tmp;
     std::vector<Operation*> expressions = (*Calculator::operations_map.find(Priority::POWER)).second;
-    for (int i = 0; i < str.length(); ++i) {
+    //for (int i = 0; i < str.length(); ++i) {
+    for (int i = str.length()-1; i >=0; i--) {
         tmp = str[i];
         if (brackets == 0) {
             for (auto& el : expressions) {
@@ -109,7 +111,8 @@ void Expression::processFirstPriorityOperations(const std::string &str, bool *is
     int brackets = 0;
     std::string tmp;
     std::vector<Operation*> expressions = (*Calculator::operations_map.find(Priority::MUL_DIV)).second;
-    for (int i = 0; i < str.length(); ++i) {
+    //for (int i = 0; i < str.length(); ++i) {
+    for (int i = str.length() - 1; i >= 0; i--) {
         tmp = str[i];
         if (brackets == 0) {
             for (auto& el :expressions) {
@@ -132,7 +135,8 @@ void Expression::processSecondPriorityOperations(const std::string &str, bool *i
     int brackets = 0;
     std::string tmp;
     std::vector<Operation*> expressions = (*Calculator::operations_map.find(Priority::ADD_SUB)).second;
-    for (int i = 0; i < str.length(); ++i) {
+    //for (int i = 0; i < str.length(); ++i) {
+    for (int i = str.length() - 1; i >= 0; i--) {
         tmp = str[i];
         if (brackets == 0) {
             for (auto& el : expressions) {                
@@ -196,9 +200,18 @@ void Expression::addExpression(std::string str, IExpression *&place) {
     }
     opertmp = defineTrigonometry(str);
     if (opertmp) {
-        place = new Function(tmp, opertmp);
-        place->negative = first_minus;
-        return;
+        int i = 0;
+        while (isalpha(tmp[i])) i++;
+        for (i;i < tmp.size();i++) {
+            if (str[i] == BaseOperation::right_bracket) {
+                break;
+            }
+        }
+        if (i == tmp.size()-1) {
+            place = new Function(tmp, opertmp);
+            place->negative = first_minus;            
+            return;
+        }
     }
     opertmp = defineConstant(str);
     if (opertmp) {

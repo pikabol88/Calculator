@@ -27,6 +27,8 @@ private:
         FLOAT_POINT,
         ALPHA,
         BRACKET,
+        RIGHT_BRACKET,
+        LEFT_BRACKET,
         NULLIC,
         OPERATION,
     }symbol_t;
