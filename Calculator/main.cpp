@@ -15,12 +15,12 @@ int main() {
         result = calculator.runCalculating(str);
         if (ErrorState::isSuccess()) {
             std::cout << "answer:\n";
-            std::cout << result << "\n\n";
-            std::cout << "enter the expression:\n";
+            std::cout << result << "\n\n";           
         }
         else {
-            std::cout << ErrorState::getErrorMessage()<<"\n";
+            std::cout << ErrorState::getErrorMessage()<<"\n\n";
         }
+        std::cout << "enter the expression:\n";
     }
 
     return 0;

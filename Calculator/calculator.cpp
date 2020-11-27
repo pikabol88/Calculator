@@ -109,7 +109,7 @@ std::string Calculator::unaryOperationsProcessing(std::string str) {
                 i++;
                 if (str[i] == '-') { str[i] = BaseOperation::unary_minus; }
                 else if (str[i] == '+') { str[i] = BaseOperation::unary_plus; }
-                break;
+                else break;
             } while (i < size - 1);
             i--;
         }
@@ -118,6 +118,7 @@ std::string Calculator::unaryOperationsProcessing(std::string str) {
     newStr = replaceAll(newStr, "__", "");
     return newStr;
 }
+
 
 bool Calculator::processAlphaError(int *index){
     int startIndex = *(index);
@@ -136,8 +137,13 @@ bool Calculator::processOperationError(int *index) {
     int startIndex = *(index);
     int currentIndex = *(index);
     while (!isalpha(str_exp[currentIndex]) && !isdigit(str_exp[currentIndex])
-        && str_exp[currentIndex] != BaseOperation::left_bracket && str_exp[currentIndex] != BaseOperation::right_bracket) 
+        && str_exp[currentIndex] != BaseOperation::left_bracket && str_exp[currentIndex] != BaseOperation::right_bracket && str_exp[currentIndex] != BaseOperation::unary_minus) {
         currentIndex++;
+        if (currentIndex == str_exp.size()) {
+            ErrorState::setErrorState(ErrorState::ERROR_OPERATION);
+            return true;
+        }
+    }
 
     if (!isLexemDefined(substring(str_exp, startIndex, currentIndex - startIndex))) {
         ErrorState::setErrorState(ErrorState::ERROR_OPERATION);
@@ -157,8 +163,16 @@ bool Calculator::isOperationDefined(std::string lexem) {
     for (auto& el : valid_operations) {
         if (!el.compare(lexem)) { return true; }
     }
+    return isOperationUnaryMinus(lexem);
     return false;
 } 
+
+bool Calculator::isOperationUnaryMinus(std::string lexem) {
+    if (lexem[0] == BaseOperation::unary_minus) {
+        return true;
+    }
+    return false;
+}
 
 bool Calculator::isFunctionDefined(std::string lexem) {
     for (auto& el : valid_functions) {
@@ -172,34 +186,61 @@ void Calculator::processError() {
     int right_bracket = 0;
     bool isDigit = false;
     bool previosIsPoint = false;
-
+    bool previosIsAlpha = false;
+    bool previosIsBracket = false;
+    
     for (int i = 0; i < str_exp.size(); i++) {
         while (isdigit(str_exp[i])) {
+            previosIsAlpha = previosIsBracket = false;
             isDigit = true;
             i++;
         }
         if (i >= str_exp.size())  break;
         if (str_exp[i] == '.') {
-            if (previosIsPoint) {
+            if (previosIsPoint||previosIsAlpha||previosIsBracket) {
                 ErrorState::setErrorState(ErrorState::ERROR_POINT);
                 break;
+            }
+            if (!(i > 0 && isdigit(str_exp[i - 1])) && !(i < str_exp.size() - 1 && isdigit(str_exp[i + 1]))) {
+                ErrorState::setErrorState(ErrorState::ERROR_POINT);
+                    break;
             }
             previosIsPoint = true;
         } else {
             previosIsPoint = false;
             if (str_exp[i] == '(') {
+                previosIsBracket = true;
                 left_bracket++;
                 isDigit = false;
+                continue;
             } else if (str_exp[i] == ')') {
+                previosIsBracket = true;
                 right_bracket++;
                 if (!isDigit) {
                     ErrorState::setErrorState(ErrorState::ERROR_EMPTY_BRACKETS);
                     break;
                 }
+                continue;
             } else if (isalpha(str_exp[i])) {
-                if(processAlphaError(&i)) break;
+                previosIsAlpha = true;
+                if (processAlphaError(&i)) break;
+                continue;
             }
-            else if (processOperationError(&i)) break;
+            if (isOperationUnaryMinus(&str_exp[i])) {
+                if (i < str_exp.size() - 1) {
+                    if (isdigit(str_exp[i + 1]) || isalpha(str_exp[i + 1]) || str_exp[i + 1] == BaseOperation::left_bracket) {
+                        continue;
+                    }
+                }
+                ErrorState::setErrorState(ErrorState::ERROR_OPERATION);
+            }
+            else {
+                if (processOperationError(&i)) break;
+                previosIsAlpha = previosIsBracket = false;
+            }
+        }
+        if (right_bracket > left_bracket) {
+            ErrorState::setErrorState(ErrorState::ERROR_BRACKETS);
         }
     }
     if (ErrorState::isSuccess()) {

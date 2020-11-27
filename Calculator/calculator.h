@@ -32,6 +32,7 @@ private:
 
     bool isLexemDefined(std::string lexem);
     bool isOperationDefined(std::string lexem);
+    bool isOperationUnaryMinus(std::string lexem);
     bool isFunctionDefined(std::string lexem);
 
     void processError();
